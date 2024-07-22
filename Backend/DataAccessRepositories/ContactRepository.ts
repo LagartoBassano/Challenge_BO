@@ -1,7 +1,8 @@
-import { PrismaClient, Contact as PrismaContact } from '@prisma/client';
+import { PrismaClient, Contact as PrismaContact, Note as PrismaNote } from '@prisma/client';
 import PrismaClientSingleton from './Context/PrismaContext';
 import IContactRepository from '../DataAccessInterfaces/IContactRepository';
 import Contact from '../Domain/Contact';
+import Note from '../Domain/Note';
 
 class ContactRepository implements IContactRepository {
   private prisma: PrismaClient;
@@ -10,7 +11,7 @@ class ContactRepository implements IContactRepository {
     this.prisma = PrismaClientSingleton;
   }
 
-  private mapToDomain(prismaContact: PrismaContact): Contact {
+  private mapToDomain(prismaContact: PrismaContact & { notes: PrismaNote[] }): Contact {
     return new Contact({
       id: prismaContact.id,
       name: prismaContact.name,
@@ -19,13 +20,18 @@ class ContactRepository implements IContactRepository {
       cellphone: prismaContact.cellphone,
       profilePicture: prismaContact.profilePicture || undefined,
       userId: prismaContact.userId,
-      notes: [], // Placeholder, will be populated separately if needed
+      notes: prismaContact.notes.map(note => new Note({
+        id: note.id,
+        text: note.text,
+        contactId: note.contactId,
+        userId: note.userId,
+      })),
       createdAt: prismaContact.createdAt,
       updatedAt: prismaContact.updatedAt,
     });
   }
 
-  private mapToPrisma(contact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>): Omit<PrismaContact, 'id' | 'createdAt' | 'updatedAt'> {
+  private mapToPrisma(contact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt' | 'notes'>): Omit<PrismaContact, 'id' | 'createdAt' | 'updatedAt' | 'notes'> {
     return {
       name: contact.getName(),
       address: contact.getAddress(),
@@ -36,16 +42,17 @@ class ContactRepository implements IContactRepository {
     };
   }
 
-  async createContact(contact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>): Promise<Contact> {
+  async createContact(contact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt' | 'notes'>): Promise<Contact> {
     const createdContact = await this.prisma.contact.create({
       data: this.mapToPrisma(contact)
     });
-    return this.mapToDomain(createdContact);
+    return this.mapToDomain(createdContact as PrismaContact & { notes: PrismaNote[] });
   }
 
   async getContactById(id: number): Promise<Contact | null> {
     const prismaContact = await this.prisma.contact.findUnique({
-      where: { id }
+      where: { id },
+      include: { notes: true } // Ensure notes are included
     });
     return prismaContact ? this.mapToDomain(prismaContact) : null;
   }
@@ -56,18 +63,19 @@ class ContactRepository implements IContactRepository {
     const prismaContacts = await this.prisma.contact.findMany({
       where: { userId },
       skip,
-      take
+      take,
+      include: { notes: true }
     });
-    return prismaContacts.map(this.mapToDomain);
+    return prismaContacts.map(this.mapToDomain.bind(this));
   }
 
-  async updateContact(id: number, data: Partial<Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Contact> {
+  async updateContact(id: number, data: Partial<Omit<Contact, 'id' | 'createdAt' | 'updatedAt' | 'notes'>>): Promise<Contact> {
     const prismaData: Omit<PrismaContact, 'id' | 'createdAt' | 'updatedAt'> = {
       name: data.getName ? data.getName() : '',
       address: data.getAddress ? data.getAddress() : '',
       email: data.getEmail ? data.getEmail() : '',
       cellphone: data.getCellphone ? data.getCellphone() : '',
-      profilePicture: data.getProfilePicture ? (data.getProfilePicture() || null) : '',
+      profilePicture: (data.getProfilePicture ? data.getProfilePicture() : undefined) || null,
       userId: data.getUserId ? data.getUserId() : 0
     };
 
@@ -76,14 +84,14 @@ class ContactRepository implements IContactRepository {
       data: prismaData
     });
 
-    return this.mapToDomain(updatedContact);
+    return this.mapToDomain(updatedContact as PrismaContact & { notes: PrismaNote[] });
   }
 
   async deleteContact(id: number): Promise<Contact> {
     const deletedContact = await this.prisma.contact.delete({
       where: { id }
     });
-    return this.mapToDomain(deletedContact);
+    return this.mapToDomain(deletedContact as PrismaContact & { notes: PrismaNote[] });
   }
 }
 
