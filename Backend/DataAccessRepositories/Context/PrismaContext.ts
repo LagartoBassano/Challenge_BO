@@ -3,9 +3,7 @@ import { PrismaClient } from '@prisma/client';
 class PrismaClientSingleton {
   private static instance: PrismaClient | null = null;
 
-  private constructor() {
-    // Private constructor to prevent direct instantiation
-  }
+  private constructor() {}
 
   public static getInstance(): PrismaClient {
     if (PrismaClientSingleton.instance === null) {
@@ -15,5 +13,4 @@ class PrismaClientSingleton {
   }
 }
 
-// Export the singleton instance
 export default PrismaClientSingleton.getInstance();

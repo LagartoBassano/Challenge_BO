@@ -52,7 +52,7 @@ class ContactRepository implements IContactRepository {
   async getContactById(id: number): Promise<Contact | null> {
     const prismaContact = await this.prisma.contact.findUnique({
       where: { id },
-      include: { notes: true } // Ensure notes are included
+      include: { notes: true }
     });
     return prismaContact ? this.mapToDomain(prismaContact) : null;
   }
