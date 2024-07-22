@@ -1,27 +1,57 @@
-import { PrismaClient, Login } from '@prisma/client';
+import { PrismaClient, Login as PrismaLogin } from '@prisma/client';
 import PrismaClientSingleton from './Context/PrismaContext';
+import ILoginRepository from '../DataAccessInterfaces/ILoginRepository';
+import Login from '../Domain/Login';
 
-class LoginRepository {
+class LoginRepository implements ILoginRepository {
   private prisma: PrismaClient;
 
   constructor() {
     this.prisma = PrismaClientSingleton;
   }
 
+  private mapToDomain(prismaLogin: PrismaLogin): Login {
+    return new Login({
+      id: prismaLogin.id,
+      userId: prismaLogin.userId,
+      timestamp: prismaLogin.timestamp,
+      token: prismaLogin.token || ''
+    });
+  }
+
+  private mapToPrisma(login: Omit<Login, 'id' | 'timestamp'>): Omit<PrismaLogin, 'id' | 'timestamp'> {
+    return {
+      userId: login.getUserId(),
+      token: login.getToken() ?? ''
+    };
+  }
+
   async createLogin(login: Omit<Login, 'id' | 'timestamp'>): Promise<Login> {
-    return this.prisma.login.create({ data: login });
+    const createdLogin = await this.prisma.login.create({
+      data: this.mapToPrisma(login)
+    });
+    return this.mapToDomain(createdLogin);
   }
 
   async getLoginById(id: string): Promise<Login | null> {
-    return this.prisma.login.findUnique({ where: { id } });
+    const prismaLogin = await this.prisma.login.findUnique({
+      where: { id }
+    });
+    return prismaLogin ? this.mapToDomain(prismaLogin) : null;
   }
 
   async getLoginsByUserId(userId: number): Promise<Login[]> {
-    return this.prisma.login.findMany({ where: { userId } });
+    const prismaLogins = await this.prisma.login.findMany({
+      where: { userId }
+    });
+    return prismaLogins.map(this.mapToDomain);
   }
 
   async deleteLogin(id: string): Promise<Login> {
-    return this.prisma.login.delete({ where: { id } });
+    const deletedLogin = await this.prisma.login.delete({
+      where: { id }
+    });
+    return this.mapToDomain(deletedLogin);
   }
 }
 
