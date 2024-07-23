@@ -17,7 +17,7 @@ class ContactController {
   }
 
   private mapToContactResponse(contact: Contact): ContactResponse {
-    return {
+    return new ContactResponse({
       id: contact.getId(),
       name: contact.getName(),
       address: contact.getAddress(),
@@ -27,7 +27,7 @@ class ContactController {
       userId: contact.getUserId(),
       createdAt: contact.getCreatedAt(),
       updatedAt: contact.getUpdatedAt(),
-    };
+    });
   }
 
   // Helper function to map a Note to NoteResponse
@@ -78,34 +78,40 @@ class ContactController {
 
   public async createContact(req: AuthRequest, res: Response) {
     try {
+      if (!req.user || !req.user.userId) {
+        return res.status(400).json({ error: 'User ID is missing from request' });
+      }
+      
       const { userId } = req.user;
-      const contactData = { ...req.body, userId } as Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>;
-      const newContact = await this.contactLogic.createContact(contactData);
-
+      const contactData = new ContactResponse({ ...req.body, userId: userId });
+      const newContact = await this.contactLogic.createContact(contactData.toContact());
       const contactResponse = this.mapToContactResponse(newContact);
-
       res.status(201).json(contactResponse);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create contact' });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      res.status(500).json({ error: 'Failed to create contact', details: errorMessage });
     }
   }
 
   public async updateContact(req: Request<{ contactId: string }>, res: Response) {
     try {
       const { contactId } = req.params;
-      const updatedContact = await this.contactLogic.updateContact(+contactId, req.body);
-
+      const responseType = new ContactResponse(req.body);
+      const updatedContact = await this.contactLogic.updateContact(+contactId, responseType.toContact());
+  
       if (!updatedContact) {
         return res.status(404).json({ error: 'Contact not found' });
       }
-
+  
       const contactResponse = this.mapToContactResponse(updatedContact);
-
+  
       res.status(200).json(contactResponse);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update contact' });
+      console.error('Error updating contact:', error);
+      res.status(500).json({ error: 'Failed to update contact', details: error instanceof Error ? error.message : 'Unknown error' });
     }
   }
+  
 
   public async createNoteForContact(req: AuthRequest, res: Response) {
     try {
@@ -113,7 +119,6 @@ class ContactController {
       const { userId } = req.user;
       const { text } = req.body;
 
-      // Validar que `text` no esté vacío
       if (!text) {
         return res.status(400).json({ error: 'Note text is required' });
       }
@@ -122,7 +127,6 @@ class ContactController {
       const noteResponse = this.mapToNoteResponse(newNote);
       res.status(201).json(noteResponse);
     } catch (error) {
-      // Manejar el error de forma segura
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       res.status(500).json({ error: 'Failed to create note for contact', details: errorMessage });
     }

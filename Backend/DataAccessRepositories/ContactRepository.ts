@@ -20,12 +20,12 @@ class ContactRepository implements IContactRepository {
       cellphone: prismaContact.cellphone,
       profilePicture: prismaContact.profilePicture || undefined,
       userId: prismaContact.userId,
-      notes: prismaContact.notes.map(note => new Note({
+      notes: prismaContact.notes !== undefined && prismaContact.notes ? prismaContact.notes.map(note => new Note({
         id: note.id,
         text: note.text,
         contactId: note.contactId,
         userId: note.userId,
-      })),
+      })) : [],
       createdAt: prismaContact.createdAt,
       updatedAt: prismaContact.updatedAt,
     });

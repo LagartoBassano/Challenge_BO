@@ -23,7 +23,8 @@ export const AuthMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     const secretKey = process.env.JWT_SECRET_KEY || 'your-secret-key';
     const decoded = jwt.verify(token, secretKey) as { userId: number };
 
-    req.user = { id: decoded.userId }; // Añade el userId decodificado a la request
+    req.user = decoded
+    req.user.id = decoded.userId
     next();
   } catch (err) {
     return res.status(403).json({ message: 'Invalid token' });
