@@ -10,7 +10,6 @@ export class UserResponse {
     name: string;
     contacts?: ContactResponse[];
     notes?: NoteResponse[];
-    logins?: LoginResponse[];
     createdAt: Date;
     updatedAt: Date;
   
@@ -33,12 +32,6 @@ export class UserResponse {
         text: note.getText(),
         contactId: note.getContactId(),
         userId: note.getUserId(),
-      }));
-      this.logins = user.getLogins().map(login => new LoginResponse({
-        id: login.getId(),
-        userId: login.getUserId(),
-        timestamp: login.getTimestamp(),
-        token: login.getToken(),
       }));
       this.createdAt = user.getCreatedAt();
       this.updatedAt = user.getUpdatedAt();
