@@ -1,7 +1,8 @@
 import IContactRepository from '../DataAccessInterfaces/IContactRepository';
 import Contact from '../Domain/Contact';
+import IContactLogic from '../LogicInterfaces/IContactLogic';
 
-class ContactLogic {
+class ContactLogic implements IContactLogic{
   private repository: IContactRepository;
 
   constructor(repository: IContactRepository) {
