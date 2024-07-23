@@ -111,16 +111,20 @@ class ContactController {
     try {
       const { contactId } = req.params;
       const { userId } = req.user;
-      
       const { text } = req.body;
-      
+
+      // Validar que `text` no esté vacío
+      if (!text) {
+        return res.status(400).json({ error: 'Note text is required' });
+      }
+
       const newNote = await this.noteLogic.createNote(text, +contactId, userId);
-      
       const noteResponse = this.mapToNoteResponse(newNote);
-      
       res.status(201).json(noteResponse);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create note for contact', details: error.message });
+      // Manejar el error de forma segura
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      res.status(500).json({ error: 'Failed to create note for contact', details: errorMessage });
     }
   }
   

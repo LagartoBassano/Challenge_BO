@@ -6,7 +6,6 @@ export interface AuthRequest extends Request {
   user?: any;
 }
 
-// Middleware para autenticar el token JWT
 export const AuthMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
@@ -21,10 +20,10 @@ export const AuthMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   }
 
   try {
-    const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
-    const decoded = jwt.verify(token, secretKey);
+    const secretKey = process.env.JWT_SECRET_KEY || 'your-secret-key';
+    const decoded = jwt.verify(token, secretKey) as { userId: number };
 
-    req.user = decoded; // Añade el usuario decodificado a la request para usarlo en el controlador
+    req.user = { id: decoded.userId }; // Añade el userId decodificado a la request
     next();
   } catch (err) {
     return res.status(403).json({ message: 'Invalid token' });

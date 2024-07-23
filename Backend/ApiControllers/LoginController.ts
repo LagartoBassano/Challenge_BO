@@ -1,21 +1,24 @@
 import { Request, Response } from 'express';
-import ILoginLogic from '../LogicInterfaces/ILoginLogic';
-import { LoginRequest, LoginResponse } from '../ApiModels/LoginTypes';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import LoginLogic from '../Logic/LoginLogic';
+import {LoginResponse} from '../ApiModels/LoginTypes';
+
+dotenv.config();
 
 class LoginController {
-  private loginLogic: ILoginLogic;
+  constructor(private loginLogic: LoginLogic) {}
 
-  constructor(loginLogic: ILoginLogic) {
-    this.loginLogic = loginLogic;
-  }
-
-  public async createLogin(req: Request<{}, {}, { userId: number; token: string }>, res: Response) {
+  public async createLogin(req: Request<{}, {}, { userId: number; }>, res: Response) {
     try {
-      const { userId, token } = req.body;
+      const { userId } = req.body;
 
-      if (!userId || !token) {
-        return res.status(400).json({ error: 'userId and token are required' });
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
       }
+
+      const secretKey = process.env.JWT_SECRET_KEY || 'default_secret_key';
+      const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
 
       const newLogin = await this.loginLogic.createLogin(userId, token);
 
@@ -23,12 +26,13 @@ class LoginController {
         id: newLogin.getId(),
         userId: newLogin.getUserId(),
         timestamp: newLogin.getTimestamp(),
-        token: newLogin.getToken(),
+        token,
       });
 
       res.status(201).json(loginResponse);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create login', details: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      res.status(500).json({ error: 'Failed to create login', details: errorMessage });
     }
   }
 }
