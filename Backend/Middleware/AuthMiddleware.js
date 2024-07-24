@@ -18,7 +18,7 @@ const AuthMiddleware = (req, res, next) => {
     try {
         const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
         const decoded = jsonwebtoken_1.default.verify(token, secretKey);
-        req.user = decoded; // Añade el usuario decodificado a la request para usarlo en el controlador
+        req.user = decoded;
         next();
     }
     catch (err) {

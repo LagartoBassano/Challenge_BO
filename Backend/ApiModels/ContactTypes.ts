@@ -37,13 +37,11 @@ export class ContactResponse {
     }
 
     public toContact(): Contact {
-      // Genera valores predeterminados para campos faltantes
-      const defaultId = 0; // Establece un valor predeterminado, el ID real debería ser generado por la base de datos
-      const defaultCreatedAt = new Date(); // Establece la fecha actual para createdAt
-      const defaultUpdatedAt = new Date(); // Establece la fecha actual para updatedAt
-      const defaultNotes: Note[] = []; // Asume que no hay notas al principio
+      const defaultId = 0;
+      const defaultCreatedAt = new Date();
+      const defaultUpdatedAt = new Date();
+      const defaultNotes: Note[] = [];
   
-      // Crea una instancia de Contact
       return new Contact({
         id: defaultId,
         name: this.name,

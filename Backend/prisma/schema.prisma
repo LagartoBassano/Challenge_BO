@@ -24,7 +24,6 @@ model User {
   updatedAt      DateTime   @updatedAt
 }
 
-// Contact model
 model Contact {
   id             Int        @id @default(autoincrement())
   name           String
@@ -39,7 +38,6 @@ model Contact {
   updatedAt      DateTime   @updatedAt
 }
 
-// Note model
 model Note {
   id             Int        @id @default(autoincrement())
   text           String

@@ -1,4 +1,3 @@
-// src/Controllers/NoteController.ts
 import { Request, Response } from 'express';
 import INoteLogic from '../LogicInterfaces/INoteLogic';
 import { NoteRequest, NoteResponse } from '../ApiModels/NoteTypes';
