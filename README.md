@@ -34,6 +34,25 @@ npx prisma migrate dev --name nombre-migracion
 npx prisma db seed
 npx prisma generate
 
+4. **Configurar usuarios
+
+Importar datos de backup para contar con usuarios en la tabla User, ya que no se cuentan con endpoints para ello.
+Las features de creación de usuario se agregaron por posibles modificaciones a posteriori.
+
+Otra forma, sin importar el backup:
+
+Abrir DBeaver o cliente en el que se conectó a postgre y crearlos a mano.
+
+Ejemplo query:
+INSERT INTO "User" (id, name, password, "createdAt", "updatedAt")
+VALUES (
+  1
+  'BuildOnline',               
+  'BuildOnline_password',
+  NOW(),
+  NOW()
+);
+
 6. **Iniciar servidor
 
 npm run build
