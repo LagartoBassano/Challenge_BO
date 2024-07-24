@@ -55,6 +55,13 @@ VALUES (
 
 6. **Iniciar servidor
 
+Asegurarse de que estoy parado en la branch "test", ya que esta tiene los últimos cambios
+
+De otra forma:
+
+git checkout test (o "git checkout -b test" si aún no tengo la rama)
+git pull origin test
+
 npm run build
 npm start
 
