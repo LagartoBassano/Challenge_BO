@@ -1,4 +1,3 @@
-// src/Controllers/UserController.ts
 import { Request, Response, Router } from 'express';
 import IUserLogic from '../LogicInterfaces/IUserLogic';
 import { AuthRequest } from '../Middleware/AuthMiddleware';
