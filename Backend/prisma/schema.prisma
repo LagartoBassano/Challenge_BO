@@ -34,7 +34,6 @@ model Contact {
   profilePicture String?
   userId         Int
   user           User       @relation(fields: [userId], references: [id])
-  notes          Note[]
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 }

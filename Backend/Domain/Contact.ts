@@ -21,7 +21,6 @@ class Contact {
   private cellphone: string;
   private profilePicture?: string;
   private userId: number;
-  private notes: Note[];
   private createdAt: Date;
   private updatedAt: Date;
 
@@ -33,7 +32,6 @@ class Contact {
     cellphone,
     profilePicture,
     userId,
-    notes = [],
     createdAt,
     updatedAt
   }: ContactProps) {
@@ -44,7 +42,6 @@ class Contact {
     this.cellphone = cellphone;
     this.profilePicture = profilePicture;
     this.userId = userId;
-    this.notes = notes;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -57,7 +54,6 @@ class Contact {
   getCellphone(): string { return this.cellphone; }
   getProfilePicture(): string | undefined { return this.profilePicture; }
   getUserId(): number { return this.userId; }
-  getNotes(): Note[] { return this.notes; }
   getCreatedAt(): Date { return this.createdAt; }
   getUpdatedAt(): Date { return this.updatedAt; }
 
