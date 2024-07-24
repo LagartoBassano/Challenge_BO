@@ -33,6 +33,7 @@ model Contact {
   cellphone      String
   profilePicture String?
   userId         Int
+  notes          Note[]
   user           User       @relation(fields: [userId], references: [id])
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
