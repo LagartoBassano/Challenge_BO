@@ -78,6 +78,7 @@ class ContactController {
 
   public async createContact(req: AuthRequest, res: Response) {
     try {
+      this.validateContactData(req.body);
       if (!req.user || !req.user.userId) {
         return res.status(400).json({ error: 'User ID is missing from request' });
       }
@@ -95,6 +96,7 @@ class ContactController {
 
   public async updateContact(req: Request<{ contactId: string }>, res: Response) {
     try {
+      this.validateContactData(req.body);
       const { contactId } = req.params;
       const responseType = new ContactResponse(req.body);
       const updatedContact = await this.contactLogic.updateContact(+contactId, responseType.toContact());
@@ -132,6 +134,23 @@ class ContactController {
     }
   }
   
+  private validateContactData(body: any): void {
+    if (typeof body.name !== 'string') {
+      throw new Error('Invalid name. It must be a string.');
+    }
+    if (typeof body.address !== 'string') {
+      throw new Error('Invalid address. It must be a string.');
+    }
+    if (typeof body.email !== 'string') {
+      throw new Error('Invalid email. It must be a string.');
+    }
+    if (typeof body.cellphone !== 'string') {
+      throw new Error('Invalid cellphone. It must be a string.');
+    }
+    if (body.profilePicture !== undefined && typeof body.profilePicture !== 'string') {
+      throw new Error('Invalid profilePicture. It must be a string.');
+    }
+  }
 }
 
 export default ContactController;
