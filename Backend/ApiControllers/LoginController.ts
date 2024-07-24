@@ -11,6 +11,8 @@ class LoginController {
 
   public async createLogin(req: Request<{}, {}, { userId: number; }>, res: Response) {
     try {
+
+      this.validateLoginData(req.body);
       const { userId } = req.body;
 
       if (!userId) {
@@ -33,6 +35,12 @@ class LoginController {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       res.status(500).json({ error: 'Failed to create login', details: errorMessage });
+    }
+  }
+
+  private validateLoginData(body: {userId: any}): void {
+    if (typeof body.userId !== 'number') {
+      throw new Error('Invalid userId. It must be a number.');
     }
   }
 }
