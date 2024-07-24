@@ -117,6 +117,7 @@ class ContactController {
 
   public async createNoteForContact(req: AuthRequest, res: Response) {
     try {
+      this.validateNoteData(req.body);
       const { contactId } = req.params;
       const { userId } = req.user;
       const { text } = req.body;
@@ -149,6 +150,12 @@ class ContactController {
     }
     if (body.profilePicture !== undefined && typeof body.profilePicture !== 'string') {
       throw new Error('Invalid profilePicture. It must be a string.');
+    }
+  }
+
+  private validateNoteData(body: any): void {
+    if (typeof body.text !== 'string') {
+      throw new Error('Invalid text. It must be a string.');
     }
   }
 }

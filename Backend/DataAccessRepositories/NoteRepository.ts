@@ -53,7 +53,6 @@ class NoteRepository implements INoteRepository {
   }
 
   async updateNote(id: number, data: Partial<Omit<Note, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Note> {
-    // Ensure that data contains the necessary fields for Prisma
     const prismaData: Omit<PrismaNote, 'id' | 'createdAt' | 'updatedAt'> = {
       text: data.getText ? data.getText() : '',
       contactId: data.getContactId ? data.getContactId() : 0,
