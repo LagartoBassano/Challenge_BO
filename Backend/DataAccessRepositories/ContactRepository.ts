@@ -56,8 +56,8 @@ class ContactRepository implements IContactRepository {
     const take = pageSize;
     const prismaContacts = await this.prisma.contact.findMany({
       where: { userId },
-      skip,
-      take,
+      skip: skip,
+      take: take,
       include: { notes: true }
     });
     return prismaContacts.map(this.mapToDomain.bind(this));
