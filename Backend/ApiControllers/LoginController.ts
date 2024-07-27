@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import LoginLogic from '../Logic/LoginLogic';
+import ILoginLogic from '../LogicInterfaces/ILoginLogic';
 import {LoginResponse} from '../ApiModels/LoginTypes';
 
 dotenv.config();
 
 class LoginController {
-  constructor(private loginLogic: LoginLogic) {}
+  constructor(private loginLogic: ILoginLogic) {}
 
   public async createLogin(req: Request<{}, {}, { userId: number; }>, res: Response) {
     try {
